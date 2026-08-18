@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GamePrice Hunter — Compare Preços de Jogos</title>
+  <meta name="description" content="Encontre os melhores preços de jogos nas principais lojas digitais." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #07070b;
+      --bg-elevated: #0e0e14;
+      --bg-card: #12121a;
+      --border: rgba(255,255,255,0.06);
+      --border-strong: rgba(255,255,255,0.1);
+      --neon: #00ff9d;
+      --neon-dim: #00c97a;
+      --neon-glow: rgba(0, 255, 157, 0.35);
+      --purple: #a78bfa;
+      --purple-glow: rgba(167, 139, 250, 0.3);
+      --cyan: #22d3ee;
+      --text: #f4f4f8;
+      --text-secondary: #a1a1b5;
+      --text-muted: #6b6b80;
+      --radius: 16px;
+      --radius-lg: 22px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0,255,157,0.25);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,255,157,0.4); }
+
+    #particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 68px;
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    header.scrolled {
+      background: rgba(7, 7, 11, 0.82);
+      backdrop-filter: blur(24px) saturate(1.4);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .logo-mark {
+      width: 38px; height: 38px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, rgba(0,255,157,0.18), rgba(167,139,250,0.12));
+      border: 1px solid rgba(0,255,157,0.25);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 20px var(--neon-glow);
+    }
+    .logo-mark svg { width: 20px; height: 20px; color: var(--neon); }
+    .logo-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .logo-text .g { color: var(--neon); }
+    .logo-text .p { color: var(--purple); }
+
+    nav { display: flex; gap: 8px; }
+    nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 10px;
+      transition: color 0.2s, background 0.2s;
+    }
+    nav a:hover {
+      color: var(--neon);
+      background: rgba(0,255,157,0.06);
+    }
+
+    .btn-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,255,157,0.3);
+      background: linear-gradient(135deg, rgba(0,255,157,0.1), rgba(0,255,157,0.04));
+      color: var(--neon);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-live::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(0,255,157,0.15), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.5s;
+    }
+    .btn-live:hover::before { transform: translateX(100%); }
+    .btn-live:hover {
+      border-color: var(--neon);
+      box-shadow: 0 0 24px var(--neon-glow);
+    }
+    .btn-live .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--neon);
+      box-shadow: 0 0 8px var(--neon);
+      animation: pulse-dot 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 24px 100px;
+      text-align: center;
+      z-index: 1;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 700px; height: 500px;
+      top: 40%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(ellipse, rgba(0,255,157,0.12) 0%, rgba(167,139,250,0.06) 40%, transparent 70%);
+      filter: blur(40px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-controller {
+      position: absolute;
+      top: 48%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(820px, 95vw);
+      opacity: 0.18;
+      z-index: 0;
+      filter: drop-shadow(0 0 60px rgba(0,255,157,0.2));
+      pointer-events: none;
+      animation: float-ctrl 8s ease-in-out infinite;
+    }
+    @keyframes float-ctrl {
+      0%, 100% { transform: translate(-50%, -50%); }
+      50% { transform: translate(-50%, -52%); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 720px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      border-radius: 999px;
+      background: rgba(0,255,157,0.08);
+      border: 1px solid rgba(0,255,157,0.22);
+      color: var(--neon);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 28px;
+      letter-spacing: 0.02em;
+      backdrop-filter: blur(8px);
+    }
+    .badge svg { width: 14px; height: 14px; }
+
+    .hero h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2.6rem, 6.5vw, 4.2rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+    .hero h1 .line { display: block; }
+    .hero h1 .accent {
+      background: linear-gradient(135deg, var(--neon) 0%, #5eead4 50%, var(--purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 30px var(--neon-glow));
+    }
+
+    .hero-sub {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      max-width: 480px;
+      margin: 0 auto 40px;
+      line-height: 1.65;
+    }
+
+    .search-wrap {
+      max-width: 560px;
+      margin: 0 auto 22px;
+      position: relative;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: rgba(14, 14, 20, 0.85);
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      padding: 6px 6px 6px 20px;
+      backdrop-filter: blur(16px);
+      transition: border-color 0.25s, box-shadow 0.25s;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    }
+    .search-box:focus-within {
+      border-color: rgba(0,255,157,0.45);
+      box-shadow: 0 0 0 4px rgba(0,255,157,0.08), 0 12px 40px rgba(0,0,0,0.4);
+    }
+    .search-box svg.search-icon {
+      width: 20px; height: 20px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    .search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 0.95rem;
+      padding: 14px 14px;
+      font-family: inherit;
+    }
+    .search-box input::placeholder { color: var(--text-muted); }
+
+    .btn-search {
+      background: linear-gradient(135deg, var(--neon), var(--neon-dim));
+      color: #07070b;
+      border: none;
+      border-radius: 13px;
+      padding: 13px 22px;
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.15s, box-shadow 0.2s;
+      font-family: inherit;
+      box-shadow: 0 4px 20px var(--neon-glow);
+    }
+    .btn-search:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px var(--neon-glow);
+    }
+    .btn-search:active { transform: translateY(0); }
+    .btn-search svg { width: 16px; height: 16px; }
+
+    .popular-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .tag {
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.8rem;
+      font-family: inherit;
+    }
+    .tag:hover {
+      border-color: rgba(0,255,157,0.4);
+      color: var(--neon);
+      background: rgba(0,255,157,0.08);
+      box-shadow: 0 0 16px rgba(0,255,157,0.12);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      animation: bounce 2.2s infinite;
+      opacity: 0.6;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(10px); }
+    }
+
+    .stats {
+      position: relative;
+      z-index: 1;
+      padding: 0 24px 80px;
+    }
+    .stats-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      background: linear-gradient(180deg, rgba(18,18,26,0.7), rgba(14,14,20,0.5));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px 24px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      text-align: center;
+    }
+    .stat-icon {
+      width: 44px; height: 44px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 8px;
+    }
+    .stat-icon.g { background: rgba(0,255,157,0.12); color: var(--neon); box-shadow: 0 0 20px rgba(0,255,157,0.15); }
+    .stat-icon.c { background: rgba(34,211,238,0.12); color: var(--cyan); box-shadow: 0 0 20px rgba(34,211,238,0.12); }
+    .stat-icon.p { background: rgba(167,139,250,0.12); color: var(--purple); box-shadow: 0 0 20px var(--purple-glow); }
+    .stat-icon svg { width: 22px; height: 22px; }
+    .stat-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(180deg, #fff 30%, var(--text-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 80px 24px;
+    }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+    .section-header .eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--neon);
+      margin-bottom: 12px;
+    }
+    .section-header h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1.7rem, 3.5vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 10px;
+    }
+    .section-header p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px 28px;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .step-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .step-card:hover {
+      border-color: rgba(0,255,157,0.25);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    }
+    .step-card:hover::before { opacity: 1; }
+    .step-num {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--neon);
+      letter-spacing: 0.1em;
+      margin-bottom: 18px;
+      opacity: 0.8;
+    }
+    .step-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .step-card p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+
+    .games-section {
+      background: linear-gradient(180deg, transparent, rgba(14,14,20,0.6) 20%, rgba(14,14,20,0.6) 80%, transparent);
+    }
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .game-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .game-card:hover {
+      border-color: rgba(0,255,157,0.35);
+      transform: translateY(-6px);
+      box-shadow: 0 24px 50px rgba(0,0,0,0.4), 0 0 40px rgba(0,255,157,0.06);
+    }
+    .game-cover {
+      height: 168px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+    }
+    .game-cover img.cover-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.55s ease;
+    }
+    .game-card:hover .cover-img { transform: scale(1.08); }
+    .game-cover .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(7,7,11,0.95) 0%, rgba(7,7,11,0.35) 45%, transparent 70%);
+      z-index: 1;
+    }
+    .game-cover .genre {
+      position: absolute;
+      top: 14px; left: 14px;
+      padding: 5px 11px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #e8e8f0;
+      z-index: 2;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .game-info {
+      padding: 20px 22px 22px;
+    }
+    .game-info h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      letter-spacing: -0.01em;
+    }
+    .btn-compare {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 16px;
+      border-radius: 11px;
+      background: rgba(0,255,157,0.08);
+      border: 1px solid rgba(0,255,157,0.2);
+      color: var(--neon);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-compare:hover {
+      background: rgba(0,255,157,0.16);
+      border-color: var(--neon);
+      box-shadow: 0 0 20px rgba(0,255,157,0.15);
+    }
+
+    .stores-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 14px;
+    }
+    .store-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 26px 14px;
+      text-align: center;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+    .store-card:hover {
+      border-color: rgba(0,255,157,0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    }
+    .store-logo {
+      width: 52px; height: 52px;
+      margin: 0 auto 12px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 0.95rem;
+      font-weight: 800;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: -0.02em;
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+    .store-logo img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+    .store-logo.letter {
+      font-size: 0.9rem;
+    }
+    .store-card span {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(12px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s, visibility 0.25s;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 22px;
+      width: 100%;
+      max-width: 580px;
+      max-height: 82vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,255,157,0.05);
+      transform: scale(0.94) translateY(12px);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-overlay.active .modal {
+      transform: scale(1) translateY(0);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .modal-header h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+    .modal-close {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s;
+    }
+    .modal-close:hover {
+      border-color: var(--neon);
+      color: var(--neon);
+      background: rgba(0,255,157,0.06);
+    }
+    .modal-body {
+      padding: 16px 20px 24px;
+      overflow-y: auto;
+    }
+    .result-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-radius: 13px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .result-item:hover {
+      border-color: rgba(0,255,157,0.25);
+      background: rgba(0,255,157,0.03);
+    }
+    .result-item.best {
+      border-color: rgba(0,255,157,0.4);
+      background: linear-gradient(135deg, rgba(0,255,157,0.08), rgba(0,255,157,0.02));
+      box-shadow: 0 0 24px rgba(0,255,157,0.08);
+    }
+    .result-store {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .result-store .logo {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      display: grid;
+      place-items: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      font-family: 'Outfit', sans-serif;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .result-store .name { font-weight: 600; font-size: 0.9rem; }
+    .result-store .badge-best {
+      font-size: 0.7rem;
+      color: var(--neon);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .result-price {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--neon);
+    }
+    .result-price .old {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+      font-weight: 500;
+      margin-right: 6px;
+    }
+
+    .skeleton {
+      height: 56px;
+      border-radius: 13px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      margin-bottom: 8px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 36px 24px;
+      text-align: center;
+    }
+    footer p {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .stats-inner { grid-template-columns: 1fr; gap: 28px; padding: 28px 20px; }
+      .steps { grid-template-columns: 1fr; }
+      .hero { padding-top: 110px; min-height: auto; padding-bottom: 80px; }
+      .games-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particles"></canvas>
+
+  <header id="header">
+    <div class="header-inner">
+      <a href="#" class="logo">
+        <div class="logo-mark">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/>
+            <line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/>
+            <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/>
+          </svg>
+        </div>
+        <span class="logo-text"><span class="g">Game</span>Price<span class="p">Hunter</span></span>
+      </a>
+      <nav>
+        <a href="#comparar">Comparar</a>
+        <a href="#ofertas">Ofertas</a>
+        <a href="#lojas">Lojas</a>
+      </nav>
+      <button class="btn-live">
+        <span class="dot"></span>
+        Preços ao vivo
+      </button>
+    </div>
+  </header>
+
+  <section class="hero" id="comparar">
+    <div class="hero-glow"></div>
+    <svg class="hero-controller" viewBox="0 0 800 500" fill="none">
+      <defs>
+        <linearGradient id="cg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#00ff9d" stop-opacity="0.5"/>
+          <stop offset="50%" stop-color="#a78bfa" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#00ff9d" stop-opacity="0.25"/>
+        </linearGradient>
+      </defs>
+      <path d="M160 180 C120 180 80 220 80 280 C80 340 100 380 160 380 L240 380 C260 380 280 360 290 340 L310 300 C320 280 340 270 360 270 L440 270 C460 270 480 280 490 300 L510 340 C520 360 540 380 560 380 L640 380 C700 380 720 340 720 280 C720 220 680 180 640 180 L560 180 C540 180 520 190 510 210 L490 250 C480 270 460 280 440 280 L360 280 C340 280 320 270 310 250 L290 210 C280 190 260 180 240 180 Z" stroke="url(#cg)" stroke-width="2.5" fill="rgba(0,255,157,0.025)"/>
+      <circle cx="200" cy="280" r="38" stroke="url(#cg)" stroke-width="2" fill="none"/>
+      <circle cx="200" cy="280" r="14" fill="rgba(0,255,157,0.25)"/>
+      <circle cx="580" cy="248" r="11" fill="rgba(167,139,250,0.45)"/>
+      <circle cx="612" cy="280" r="11" fill="rgba(0,255,157,0.35)"/>
+      <circle cx="548" cy="280" r="11" fill="rgba(167,139,250,0.3)"/>
+      <circle cx="580" cy="312" r="11" fill="rgba(0,255,157,0.28)"/>
+      <rect x="138" y="218" width="32" height="8" rx="4" fill="rgba(0,255,157,0.35)"/>
+      <rect x="150" y="206" width="8" height="32" rx="4" fill="rgba(0,255,157,0.35)"/>
+    </svg>
+
+    <div class="hero-content">
+      <div class="badge">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Comparador Inteligente de Preços
+      </div>
+      <h1>
+        <span class="line">Encontre o</span>
+        <span class="line"><span class="accent">melhor preço</span></span>
+        <span class="line">para seu jogo</span>
+      </h1>
+      <p class="hero-sub">Compare preços em tempo real nas maiores lojas digitais do mundo. Economize em cada compra.</p>
+
+      <div class="search-wrap">
+        <div class="search-box">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="searchInput" placeholder="Digite o nome do jogo..." autocomplete="off" />
+          <button class="btn-search" id="searchBtn">
+            Buscar
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="popular-tags">
+        <span>Populares:</span>
+        <button class="tag" data-game="Grand Theft Auto V">GTA V</button>
+        <button class="tag" data-game="Elden Ring">Elden Ring</button>
+        <button class="tag" data-game="Cyberpunk 2077">Cyberpunk 2077</button>
+        <button class="tag" data-game="Minecraft">Minecraft</button>
+      </div>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stats-inner reveal">
+      <div class="stat-item">
+        <div class="stat-icon g">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258A4 4 0 0 0 17.32 5z"/></svg>
+        </div>
+        <div class="stat-value" data-count="10">0</div>
+        <div class="stat-label">Lojas Monitoradas</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon c">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        </div>
+        <div class="stat-value" data-count="100">0</div>
+        <div class="stat-label">Melhor Preço Sempre</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon p">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8" rx="1"/><rect x="14" y="6" width="3" height="12" rx="1"/></svg>
+        </div>
+        <div class="stat-value" data-count="50">0</div>
+        <div class="stat-label">Mil Comparações</div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <span class="eyebrow">Simples assim</span>
+        <h2>Como funciona</h2>
+        <p>Encontre o melhor preço em 3 passos simples</p>
+      </div>
+      <div class="steps">
+        <div class="step-card reveal">
+          <div class="step-num">01</div>
+          <h3>Busque seu jogo</h3>
+          <p>Digite o nome do jogo que deseja comprar na barra de pesquisa.</p>
+        </div>
+        <div class="step-card reveal" style="transition-delay: 0.1s">
+          <div class="step-num">02</div>
+          <h3>Compare preços</h3>
+          <p>Veja os preços em todas as lojas digitais em um único lugar.</p>
+        </div>
+        <div class="step-card reveal" style="transition-delay: 0.2s">
+          <div class="step-num">03</div>
+          <h3>Economize</h3>
+          <p>Escolha a melhor oferta e economize na sua compra.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="games-section" id="ofertas">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <span class="eyebrow">Tendências</span>
+        <h2>Jogos Populares</h2>
+        <p>Busque preços dos jogos mais procurados</p>
+      </div>
+      <div class="games-grid" id="gamesGrid"></div>
+    </div>
+  </section>
+
+  <section id="lojas">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <span class="eyebrow">Parceiros</span>
+        <h2>Lojas Monitoradas</h2>
+        <p>Comparamos preços das maiores plataformas do mundo</p>
+      </div>
+      <div class="stores-grid reveal" id="storesGrid"></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Buscas seguras e privadas. Não armazenamos seus dados pessoais. · GamePrice Hunter © 2026</p>
+  </footer>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Resultados</h3>
+        <button class="modal-close" id="modalClose" aria-label="Fechar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let w, h;
+
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    class Particle {
+      constructor() { this.reset(true); }
+      reset(init) {
+        this.x = Math.random() * w;
+        this.y = init ? Math.random() * h : h + 10;
+        this.size = Math.random() * 1.8 + 0.4;
+        this.speed = Math.random() * 0.4 + 0.15;
+        this.opacity = Math.random() * 0.4 + 0.1;
+        this.color = Math.random() > 0.6 ? '0,255,157' : '167,139,250';
+      }
+      update() {
+        this.y -= this.speed;
+        if (this.y < -10) this.reset(false);
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${this.color},${this.opacity})`;
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 60; i++) particles.push(new Particle());
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, w, h);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    const reveals = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          if (e.target.classList.contains('stats-inner')) {
+            animateCounters(e.target);
+          }
+        }
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach(el => io.observe(el));
+
+    function animateCounters(container) {
+      const els = container.querySelectorAll('.stat-value[data-count]');
+      els.forEach(el => {
+        if (el.dataset.animated) return;
+        el.dataset.animated = '1';
+        const target = +el.dataset.count;
+        const suffix = el.dataset.count === '10' ? '+' : el.dataset.count === '100' ? '%' : 'K+';
+        const duration = 1400;
+        const start = performance.now();
+        function tick(now) {
+          const p = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.floor(eased * target) + suffix;
+          if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+
+    const games = [
+      { name: "Grand Theft Auto V", genre: "Ação / Mundo Aberto", cover: "https://cdn.cloudflare.steamstatic.com/steam/apps/271590/capsule_616x353.jpg" },
+      { name: "Elden Ring", genre: "RPG / Ação", cover: "https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/capsule_616x353.jpg" },
+      { name: "Cyberpunk 2077", genre: "RPG / FPS", cover: "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/capsule_616x353.jpg" },
+      { name: "Baldur's Gate 3", genre: "RPG / Estratégia", cover: "https://cdn.cloudflare.steamstatic.com/steam/apps/1086940/capsule_616x353.jpg" },
+      { name: "Red Dead Redemption 2", genre: "Ação / Aventura", cover: "https://cdn.cloudflare.steamstatic.com/steam/apps/1174180/capsule_616x353.jpg" },
+      { name: "The Witcher 3", genre: "RPG / Mundo Aberto", cover: "https://cdn.cloudflare.steamstatic.com/steam/apps/292030/capsule_616x353.jpg" },
+    ];
+
+    const stores = [
+      { name: "Steam", letter: "S", bg: "#1b2838", color: "#66c0f4", icon: "https://cdn.simpleicons.org/steam/66c0f4" },
+      { name: "Epic Games", letter: "E", bg: "#121212", color: "#fff", icon: "https://cdn.simpleicons.org/epicgames/ffffff" },
+      { name: "GOG", letter: "G", bg: "#2e1a30", color: "#c4a5d0", icon: "https://cdn.simpleicons.org/gogdotcom/c4a5d0" },
+      { name: "Xbox", letter: "X", bg: "#0e3d0e", color: "#9bf00b", icon: null },
+      { name: "PlayStation", letter: "PS", bg: "#003087", color: "#fff", icon: "https://cdn.simpleicons.org/playstation/ffffff" },
+      { name: "Nintendo", letter: "N", bg: "#e60012", color: "#fff", icon: null },
+      { name: "Nuuvem", letter: "Nu", bg: "#003d5c", color: "#00a0e3", icon: null },
+      { name: "Kinguin", letter: "K", bg: "#3d1a00", color: "#ff6b00", icon: null },
+      { name: "Green Man", letter: "GM", bg: "#1a2e0a", color: "#7cb342", icon: null },
+      { name: "Humble", letter: "HB", bg: "#3d0a0a", color: "#ff5a5a", icon: "https://cdn.simpleicons.org/humblebundle/ff5a5a" },
+    ];
+
+    function generatePrices() {
+      const base = 70 + Math.random() * 160;
+      return stores.map(s => {
+        const discount = Math.random() > 0.35 ? Math.floor(Math.random() * 55) + 5 : 0;
+        const price = base * (0.65 + Math.random() * 0.55);
+        const final = discount ? price * (1 - discount / 100) : price;
+        return { store: s.name, letter: s.letter, bg: s.bg, color: s.color, icon: s.icon, price: final, oldPrice: discount ? price : null, discount, best: false };
+      }).sort((a, b) => a.price - b.price)
+        .map((r, i) => ({ ...r, best: i === 0 }));
+    }
+
+    const gamesGrid = document.getElementById('gamesGrid');
+    games.forEach((g, i) => {
+      const card = document.createElement('div');
+      card.className = 'game-card reveal';
+      card.style.transitionDelay = (i * 0.06) + 's';
+      card.innerHTML = `
+        <div class="game-cover">
+          <img class="cover-img" src="${g.cover}" alt="${g.name}" loading="lazy" />
+          <div class="overlay"></div>
+          <span class="genre">${g.genre}</span>
+        </div>
+        <div class="game-info">
+          <h3>${g.name}</h3>
+          <button class="btn-compare" data-game="${g.name}">Comparar preços →</button>
+        </div>
+      `;
+      gamesGrid.appendChild(card);
+      io.observe(card);
+    });
+
+    const storesGrid = document.getElementById('storesGrid');
+    stores.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'store-card';
+      const logoContent = s.icon
+        ? `<img src="${s.icon}" alt="${s.name}" />`
+        : s.letter;
+      card.innerHTML = `
+        <div class="store-logo ${s.icon ? '' : 'letter'}" style="background:${s.bg}; color:${s.color}">${logoContent}</div>
+        <span>${s.name}</span>
+      `;
+      storesGrid.appendChild(card);
+    });
+
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+
+    function showResults(gameName) {
+      modalTitle.textContent = 'Preços de ' + gameName;
+      modalBody.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      setTimeout(() => {
+        const prices = generatePrices();
+        modalBody.innerHTML = prices.map(p => `
+          <div class="result-item ${p.best ? 'best' : ''}">
+            <div class="result-store">
+              <div class="logo" style="background:${p.bg}; color:${p.color}">${p.icon ? '<img src="'+p.icon+'" alt="" style="width:20px;height:20px;object-fit:contain">' : p.letter}</div>
+              <div>
+                <div class="name">${p.store}</div>
+                ${p.best ? '<div class="badge-best">★ Melhor preço</div>' : (p.discount ? '<div class="badge-best" style="color:var(--text-muted)">−' + p.discount + '%</div>' : '')}
+              </div>
+            </div>
+            <div class="result-price">
+              ${p.oldPrice ? '<span class="old">R$ ' + p.oldPrice.toFixed(2) + '</span>' : ''}
+              R$ ${p.price.toFixed(2)}
+            </div>
+          </div>
+        `).join('');
+      }, 500);
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    function doSearch() {
+      const q = document.getElementById('searchInput').value.trim();
+      if (!q) {
+        document.getElementById('searchInput').focus();
+        return;
+      }
+      showResults(q);
+    }
+
+    document.getElementById('searchBtn').addEventListener('click', doSearch);
+    document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+    document.querySelectorAll('.tag').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('searchInput').value = btn.dataset.game;
+        showResults(btn.dataset.game);
+      });
+    });
+
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('.btn-compare');
+      if (btn) {
+        e.stopPropagation();
+        showResults(btn.dataset.game);
+      }
+      const card = e.target.closest('.game-card');
+      if (card && !e.target.closest('.btn-compare')) {
+        showResults(card.querySelector('h3').textContent);
+      }
+    });
+  </script>
+</body>
+</html>
